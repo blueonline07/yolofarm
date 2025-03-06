@@ -13,9 +13,8 @@ class DataRetrievalStrategy(ABC):
 
 
 class RestApiStrategy(DataRetrievalStrategy):
-    def __init__(self, feed_key):
-        self.client = RestClient(ADAFRUIT_USERNAME, ADAFRUIT_KEY, feed_key)
-        self.feed_key = feed_key
+    def __init__(self):
+        self.client = RestClient(ADAFRUIT_USERNAME, ADAFRUIT_KEY)
 
     def get_client(self):
         return self.client
@@ -42,11 +41,11 @@ class MqttStrategy(DataRetrievalStrategy, Subject):
         return self.client
 
 class RestClient:
-    def __init__(self, username, key, feed_key):
+    def __init__(self, username, key):
         self.username = username
         self.key = key
-        self.feed_key = feed_key
 
-    def get_data(self):
-        resp = requests.get(f"https://io.adafruit.com/api/v2/{self.username}/feeds/{self.feed_key}/data", headers={"X-AIO-Key": self.key})
-        return resp.json()
+    def get_data(self, feed_key):
+        resp = requests.get(f"https://io.adafruit.com/api/v2/{self.username}/feeds/{feed_key}/data", headers={"X-AIO-Key": self.key}).json()
+        return [{"created_at": item["created_at"], "value": item["value"]} for item in resp]
+

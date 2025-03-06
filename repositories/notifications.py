@@ -15,12 +15,18 @@ class NotificationRepository(Singleton):
         """
         Create a notification for a user
         :param message:
-        :return:
+        :return: id of the notification
         """
         notification = {
             'message': message,
             'created_at': datetime.now()
         }
         res = self.collection.insert_one(notification)
-        print(res.inserted_id)
         return str(res.inserted_id)
+
+    def get_all(self):
+        """
+        Get all notifications
+        :return: list of notifications
+        """
+        return list(self.collection.find())

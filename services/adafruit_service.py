@@ -1,3 +1,4 @@
+from patterns.singleton import Singleton
 from patterns.strategy import RestApiStrategy, MqttStrategy
 from patterns.observer import Observer
 from repositories.notifications import NotificationRepository
@@ -5,21 +6,22 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class AdafruitService(Observer):
+class AdafruitService(Observer, Singleton):
     def __init__(self):
         super().__init__()
         self.feeds = {
-            'light': RestApiStrategy('light').get_client(),
+            'light': MqttStrategy('light').attach(self).get_client(),
             'temp': MqttStrategy('temp').attach(self).get_client(),
         }
+        self.rest_client = RestApiStrategy().get_client()
         self.notifications_repo = NotificationRepository()
 
-    def get_data(self, feed_key):
+    def get_data(self, feed_keys):
         try:
-            return self.feeds[feed_key].get_data()
-        except AttributeError:
-            logger.error(f"Feed {feed_key} is using MQTT, please use the update method instead")
-            return "Feed is using MQTT, please use the update method instead"
+            return {feed_key: self.rest_client.get_data(feed_key) for feed_key in feed_keys}
+        except Exception as e:
+            logger.error(e)
+            return "Error while fetching data from Adafruit"
 
     def update(self, data):
         #TODO: do the checking here, then notify to user
