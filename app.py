@@ -1,21 +1,38 @@
 from flask import Flask
-from controllers.data_controller import data_bp
+from services.mqtt import AdafruitService
+from flask import request, Response
+from flask_cors import CORS
 import logging
+import json
+from services.mqtt import event_queue
+
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 app = Flask(__name__)
+CORS(app, resources={r"/stream": {"origins": "*"}}, supports_credentials=True)
 
-# Initialize MongoDB
+sv = AdafruitService()
+@app.route("/stream")
+def stream():
+    def event_stream():
+        while True:
+            data = event_queue.get()  # Block until new data arrives
+            yield f"data: {json.dumps({'type':data[0], 'value':data[1]})}\n\n"
+            print(data)
 
-# Register blueprints
-app.register_blueprint(data_bp, url_prefix='/api')
-
+    return Response(event_stream(), mimetype="text/event-stream")
 @app.route('/')
 def hello_world():
     return 'IoT Backend API'
+
+# @app.route('/<feed>', methods=['POST'])
+# def post_data(feed):
+#     val = request.json.get('value')
+#     s.publish_val(feed, val, activity_type='MANUAL')
+#     return f"value {val} added to feed {feed}"
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,33 +2,29 @@ from pymongo import MongoClient
 from datetime import datetime
 from config import MONGODB_URI
 from patterns.singleton import Singleton
-from enum import Enum
 
-class NotificationType(Enum):
-    INFO = 1
-    WARNING = 2
-
-
-class NotificationRepository(Singleton):
+class ActivityRepository(Singleton):
     def __init__(self):
         self.client = MongoClient(MONGODB_URI)
         self.db = self.client.get_database('yolofarm')
-        self.collection = self.db.notifications
+        self.collection = self.db.activities
 
 
-    def create(self, message, type):
+    def create(self, action, type,  device):
         """
-        Create a notification for a user
+        save an activity
+        :param device:
         :param type:
-        :param message:
-        :return: id of the notification
+        :param action:
+        :return: id of the activity
         """
-        notification = {
-            'message': message,
+        activity = {
+            'action': action,
             'type': type,
+            'device': device,
             'created_at': datetime.now()
         }
-        res = self.collection.insert_one(notification)
+        res = self.collection.insert_one(activity)
         return str(res.inserted_id)
 
     def get_all(self):
