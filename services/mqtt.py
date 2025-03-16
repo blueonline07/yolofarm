@@ -21,8 +21,11 @@ class AdafruitService():
         self.activity_repo = ActivityRepository()
 
     def publish_val(self, topic, val, activity_type = 'AUTO'):
-        self.activity_repo.create(val, activity_type, topic)
-        self.client.publish(topic, str(val))
+        # self.activity_repo.create(val, activity_type, topic)
+        try:
+            self.client.publish(topic, str(val))
+        except ValueError:
+            print('Cant convert value to string')
 
     def message_received(self, client, topic, message):
         # feed , msg = self.strategy.make_decision(topic, message)

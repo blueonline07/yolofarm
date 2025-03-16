@@ -12,7 +12,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 app = Flask(__name__)
-CORS(app, resources={r"/stream": {"origins": "*"}}, supports_credentials=True)
+CORS(app)
 
 sv = AdafruitService()
 @app.route("/stream")
@@ -28,11 +28,11 @@ def stream():
 def hello_world():
     return 'IoT Backend API'
 
-# @app.route('/<feed>', methods=['POST'])
-# def post_data(feed):
-#     val = request.json.get('value')
-#     s.publish_val(feed, val, activity_type='MANUAL')
-#     return f"value {val} added to feed {feed}"
+@app.route('/<feed>', methods=['POST'])
+def post_data(feed):
+    val = request.json.get('value')
+    sv.publish_val(feed, val)
+    return f"value {val} added to feed {feed}"
 
 if __name__ == '__main__':
     app.run(debug=True)
