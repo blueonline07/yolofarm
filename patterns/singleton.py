@@ -1,5 +1,6 @@
 class Singleton:
     _instance = None
+    _initialized = False
 
     def __new__(cls):
         if cls._instance is None:
