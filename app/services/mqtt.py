@@ -1,7 +1,7 @@
 from Adafruit_IO import MQTTClient
-from services.utils import make_decision
-from config import ADAFRUIT_KEY, ADAFRUIT_USERNAME
-from patterns.observer import Subject
+from app.services.utils import make_decision
+from app.config import ADAFRUIT_KEY, ADAFRUIT_USERNAME
+from app.patterns.observer import Subject
 import json
 
 feeds = ['temp', 'humidity', 'moisture', 'light']
