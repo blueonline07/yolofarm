@@ -10,5 +10,5 @@ RUN python -m pip install --upgrade pip setuptools wheel
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 80
+EXPOSE 5000
 CMD ["python", "app.py"]
