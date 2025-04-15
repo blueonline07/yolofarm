@@ -24,7 +24,7 @@ class Alert:
 
     def __repr__(self):
         return f"Alert(topic={self.topic}, issue={self.issue}, value={self.value}, timestamp={self.timestamp})"
-    
+
 class Log:
     def __init__(self, action: Action, device: str):
         self.action = action
