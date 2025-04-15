@@ -11,5 +11,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 AdafruitService(socket=socketio)
 app.register_blueprint(data_bp, url_prefix='/data')
 
+@app.route('/')
+def index():
+    return 'Yolo farm đang chạy trên Azure 🚀'
+
 if __name__ == '__main__':
     socketio.run(app)
