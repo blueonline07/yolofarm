@@ -15,8 +15,8 @@ class Subject:
             pass
 
     def notify(self, data):
-        for observer in self._observers:
-            observer.update(data)
+        if data is not None:
+            list(map(lambda observer: observer.update(data), self._observers))
 
 class Observer(ABC):
     @abstractmethod
