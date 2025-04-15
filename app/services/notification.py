@@ -31,7 +31,7 @@ class EmailNotification(BaseNotification):
                     if MAIL_USE_SSL:
                         server.starttls()
 
-                    print(MAIL_USERNAME, MAIL_PASSWORD)
+
                     server.login(MAIL_USERNAME, MAIL_PASSWORD)
                     server.send_message(msg)
             except Exception as e:
