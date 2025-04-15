@@ -9,7 +9,7 @@ feeds = ['temp', 'humidity', 'moisture', 'light']
 class AdafruitService(Subject):
 
     def __init__(self, socket=None):
-
+        super().__init__()
         self.client = MQTTClient(ADAFRUIT_USERNAME, ADAFRUIT_KEY)
         self.client.on_message = self.message_received
         self.client.connect()
