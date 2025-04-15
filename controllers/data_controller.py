@@ -9,3 +9,5 @@ def post_data(feed):
     val = request.json.get('value')
     sv.publish_val(feed, val)
     return f"value {val} added to feed {feed}"
+
+
