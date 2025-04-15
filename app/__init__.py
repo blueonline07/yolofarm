@@ -25,10 +25,13 @@ def create_app():
     def subscribe():
         data = request.json
         email = data.get('email')
-        if not email:
-            return "Email is required", 400
-        if email in sv._observers:
-            return f"{email} is already subscribed", 400
-        sv.attach(EmailNotification(email))
-        return f"Subscribed {email} for notifications", 200
+
+        if email:
+            if email in sv._observers:
+                return f"{email} is already subscribed", 400
+
+            sv.attach(EmailNotification(email))
+            return f"Subscribed {email} for notifications", 200
+
+
     return socketio, app

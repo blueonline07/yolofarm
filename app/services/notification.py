@@ -4,7 +4,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
 
-
 class BaseNotification(Observer):
     def update(self, data):
         pass
@@ -36,5 +35,7 @@ class EmailNotification(BaseNotification):
                 print(f"Failed to send email: {e}")
 
             print(f"Email sent to {self.address}")
-            
+
+
+
     

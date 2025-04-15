@@ -53,7 +53,6 @@ def get_user(username):
             return jsonify({
                 "username": user['username'],
                 "email": user['email'],
-                "phone": user['phone'],
                 "role": user['role']
             }), 200
         else:

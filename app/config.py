@@ -20,4 +20,8 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 MONGODB_URI = os.environ.get("MONGODB_URI")
 
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
+
 JWT_SECRET = os.environ.get("JWT_SECRET")

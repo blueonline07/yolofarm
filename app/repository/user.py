@@ -21,13 +21,13 @@ class UserRepository:
         username = user.get('username')
         email = user.get('email')
         password = user.get('password')
-        phone = user.get('phone')
+
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         user_data = {
             'username': username,
             'email': email,
             'password': hashed_password,
-            'phone': phone,
+
             'role':'user'
         }
         try:
