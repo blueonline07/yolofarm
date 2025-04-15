@@ -15,6 +15,9 @@ MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", True)
 MAIL_USE_SSL = os.environ.get("MAIL_USE_SSL", False)
 
+ADMIN_USERNAME = os.environ.get("ADMIN_USER_NAME")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
+MONGODB_URI = os.environ.get("MONGODB_URI")
 
-
+JWT_SECRET = os.environ.get("JWT_SECRET")

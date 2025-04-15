@@ -25,7 +25,7 @@ class Alert:
     def __repr__(self):
         return f"Alert(topic={self.topic}, issue={self.issue}, value={self.value}, timestamp={self.timestamp})"
 
-class Log:
+class Action:
     def __init__(self, action: Action, device: str):
         self.action = action
         self.device = device
@@ -34,6 +34,7 @@ class Log:
     def __repr__(self):
         return f"Log(action={self.action}, device={self.device}, timestamp={self.timestamp})"
         
+
 
 class Visitor:
     def visit(self, topic, value):
@@ -47,15 +48,15 @@ class Visitor:
             return self.visit_light(value)
         
     def visit_temp(self, value):
-        if value > 30:
+        if value > 32:
             return Alert(topic='temp', issue=Bound.HIGHER, value=value)
-        elif value < 10:
+        elif value < 18:
             return Alert(topic='temp', issue=Bound.LOWER, value=value)
         return None
     def visit_humidity(self, value):
         if value > 80:
             return Alert(topic='humidity', issue=Bound.HIGHER, value=value)
-        elif value < 20:
+        elif value < 40:
             return Alert(topic='humidity', issue=Bound.LOWER, value=value)
         return None
     def visit_moisture(self, value):

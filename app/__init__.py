@@ -1,6 +1,6 @@
 from flask import Flask, request
 from app.services.mqtt import AdafruitService
-from app.controllers.auth_controller import auth_bp
+from app.controllers.user_controller import user_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from app.services.notification import EmailNotification
@@ -13,7 +13,7 @@ def create_app():
     socketio = SocketIO(app, cors_allowed_origins="*")
 
     sv = AdafruitService(socket=socketio)
-    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(user_bp, url_prefix='/users')
 
     @app.route('/<feed>', methods=['POST'])
     def post_data(feed):

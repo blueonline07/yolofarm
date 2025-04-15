@@ -1,6 +1,5 @@
 from app.patterns.observer import Observer
 import smtplib
-from email.message import EmailMessage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
@@ -22,7 +21,7 @@ class EmailNotification(BaseNotification):
             msg['From'] = MAIL_USERNAME
             msg['To'] = self.address
             msg['Subject'] = 'Adafruit Notification'
-            body = f"haha"
+            body = str(data)
             msg.attach(MIMEText(body, 'plain'))
             try:
                 with smtplib.SMTP(MAIL_SERVER, MAIL_PORT) as server:
@@ -30,7 +29,6 @@ class EmailNotification(BaseNotification):
                         server.starttls()
                     if MAIL_USE_SSL:
                         server.starttls()
-
 
                     server.login(MAIL_USERNAME, MAIL_PASSWORD)
                     server.send_message(msg)
