@@ -1,22 +1,19 @@
 from pymongo import MongoClient
 from app.config import MONGODB_URI
 import bcrypt
+from app.patterns.singleton import Singleton
 
-
-class UserRepository:
+class UserRepository(Singleton):
 
     def __init__(self):
-        # Use environment variable or default to localhost if not provided
+        if self._initialized:
+            return
+        self._initialized = True
         self.client = MongoClient(MONGODB_URI)
         self.db = self.client['yolofarm']
         self.users = self.db['users']
-        print(list(self.users.find()))
-        
-    def close_connection(self):
-        # Close the MongoDB connection when done
-        if hasattr(self, 'client'):
-            self.client.close()
-    
+
+
     def create_user(self, user):
         username = user.get('username')
         email = user.get('email')
@@ -27,7 +24,6 @@ class UserRepository:
             'username': username,
             'email': email,
             'password': hashed_password,
-
             'role':'user'
         }
         try:

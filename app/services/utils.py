@@ -1,6 +1,8 @@
 from enum import Enum
 from abc import ABC
 from datetime import datetime
+from app.patterns.observer import Observer
+import json
 
 class Bound(Enum):
     HIGHER = "higher"
@@ -75,4 +77,3 @@ class Visitor:
 def make_decision(topic: str, value: float) -> Alert:
     v = Visitor()
     return v.visit(topic, float(value))
-

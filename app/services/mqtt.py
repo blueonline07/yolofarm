@@ -2,13 +2,16 @@ from Adafruit_IO import MQTTClient
 from app.services.utils import make_decision
 from app.config import ADAFRUIT_KEY, ADAFRUIT_USERNAME
 from app.patterns.observer import Subject
-import json
+from app.patterns.singleton import Singleton
 
 feeds = ['temp', 'humidity', 'moisture', 'light']
 
-class AdafruitService(Subject):
+class AdafruitService(Singleton, Subject):
 
-    def __init__(self, socket=None):
+    def __init__(self):
+        if self._initialized:
+            return
+        self._initialized = True
         super().__init__()
         self.client = MQTTClient(ADAFRUIT_USERNAME, ADAFRUIT_KEY)
         self.client.on_message = self.message_received
@@ -17,14 +20,16 @@ class AdafruitService(Subject):
             self.client.subscribe(feed)
 
         self.client.loop_background()
-        self.socket = socket
+
 
     def publish_val(self, topic, val):
         self.client.publish(topic, str(val))
 
     def message_received(self, client, topic, message):
         print(f"Received message '{message}' on topic '{topic}'")
-        self.socket.emit('message', json.dumps({'topic': topic, 'value': message}))
-
-        self.notify(make_decision(topic, message))
+        data = {
+            'topic': topic,
+            'value': message
+        }
+        self.notify(data)
 
