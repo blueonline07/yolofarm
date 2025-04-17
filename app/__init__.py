@@ -3,7 +3,7 @@ from app.services.mqtt import AdafruitService
 from app.controllers.user_controller import user_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
-from app.services.notification import EmailNotification
+from app.services.notification import BoundaryNotifier, BaseNotifier, ActionNotifier
 from app.services.socket_service import SocketObserver
 from app.decorators.auth import jwt_required
 
@@ -16,7 +16,10 @@ def create_app():
 
     sv = AdafruitService()
     sv.attach(SocketObserver(socketio))
-    sv.attach(EmailNotification())
+    sv.attach(BoundaryNotifier())
+    sv.attach(ActionNotifier())
+
+
 
     app.register_blueprint(user_bp, url_prefix='/users')
 
@@ -24,6 +27,7 @@ def create_app():
     @jwt_required(role=['admin'])
     def post_data(feed):
         val = request.json.get('value')
+        #TODO: restrict topic to fan, pump, led only
         sv.publish_val(feed, val)
         return f"value {val} added to feed {feed}"
 
@@ -33,7 +37,7 @@ def create_app():
     def subscribe():
         data = request.json
         email = data.get('email')
-        EmailNotification().add_subcriber(email)
+        BaseNotifier().add_subcriber(email)
         return "subscribed successfully", 200
 
     return socketio, app

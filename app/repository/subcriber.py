@@ -15,18 +15,21 @@ class SubcriberRepository(Singleton):
         self.subs = self.db['subcribers']
 
     def add(self, email):
-        user_data = {
-            'email': email,
+        data = {
+            'email': email
         }
+        if self.subs.find_one(data):
+            return data
         try:
-            self.subs.insert_one(user_data)
+            self.subs.insert_one(data)
         except Exception as e:
             raise e
         
-        return user_data
+        return data
     
     def get_all(self):
         try:
             return list(self.subs.find())
         except Exception as e:
             raise e
+        

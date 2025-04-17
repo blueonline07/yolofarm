@@ -24,6 +24,10 @@ class AdafruitService(Singleton, Subject):
 
     def publish_val(self, topic, val):
         self.client.publish(topic, str(val))
+        self.notify({
+            'topic': topic,
+            'value': val
+        })
 
     def message_received(self, client, topic, message):
         print(f"Received message '{message}' on topic '{topic}'")

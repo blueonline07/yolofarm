@@ -28,7 +28,11 @@ class Alert:
         return f"Alert(topic={self.topic}, issue={self.issue}, value={self.value}, timestamp={self.timestamp})"
 
 class Action:
-    def __init__(self, action: Action, device: str):
+    def __init__(self, action: str, device: str):
+        if action == '1':
+            action = Action.TURN_ON
+        elif action == '0':
+            action = Action.TURN_OFF
         self.action = action
         self.device = device
         self.timestamp = datetime.now()
