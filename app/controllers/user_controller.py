@@ -1,3 +1,4 @@
+from bson import ObjectId
 from flask import Blueprint, request, jsonify
 from app.repository.user import UserRepository
 from app.decorators.auth import jwt_required
@@ -12,7 +13,6 @@ user_repository = UserRepository()
 @user_bp.route('/', methods=['POST'])
 def register():
     data = request.get_json()
-    
     # Create new user
     try:
         user_repository.create_user(data)
@@ -24,15 +24,15 @@ def register():
 @user_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
     
     try:
-        user = user_repository.get_user_by_username(username)
+        user = user_repository.get_user_by_email(email)
 
         if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
             payload = {
-                'username': username,
+                'email': email,
                 'role': user['role'],
                 'exp': datetime.datetime.now() + datetime.timedelta(minutes=30)
             }
@@ -43,15 +43,17 @@ def login():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 
-@user_bp.route('/<username>', methods=['GET'])
+@user_bp.route('/<user_id>', methods=['GET'])
 @jwt_required(role=['admin'])
-def get_user(username):
+def get_user_by_id(user_id):
     try:
-        user = user_repository.get_user_by_username(username)
+        user_id = ObjectId(user_id)
+        user = user_repository.get_user_by_id(user_id)
         if user:
             return jsonify({
-                "username": user['username'],
+                "_id": str(user['_id']),
                 "email": user['email'],
                 "role": user['role']
             }), 200
@@ -59,5 +61,13 @@ def get_user(username):
             return jsonify({"error": "User not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
+
+@user_bp.route('/', methods=['GET'])
+@jwt_required(role=['admin'])
+def get_all_users():
+    try:
+        users = [{"_id": str(user['_id']), "email": user['email'], "role": user['role']} for user in user_repository.get_all_users()]
+        return jsonify(users), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -1,5 +1,4 @@
 from Adafruit_IO import MQTTClient
-from app.services.utils import make_decision
 from app.config import ADAFRUIT_KEY, ADAFRUIT_USERNAME
 from app.patterns.observer import Subject
 from app.patterns.singleton import Singleton

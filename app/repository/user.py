@@ -15,19 +15,17 @@ class UserRepository(Singleton):
 
 
     def create_user(self, user):
-        username = user.get('username')
         email = user.get('email')
         password = user.get('password')
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         user_data = {
-            'username': username,
             'email': email,
             'password': hashed_password,
             'role':'user'
         }
         try:
-            existing_user = self.get_user_by_username(username)
+            existing_user = self.get_user_by_email(email)
             if existing_user:
                 raise Exception("User already exists")
             self.users.insert_one(user_data)
@@ -36,10 +34,30 @@ class UserRepository(Singleton):
         
         return user
 
-    def get_user_by_username(self, username):
+    def get_user_by_email(self, email):
         try:
-            return self.users.find_one({'username': username})
+            return self.users.find_one({'email': email})
 
         except Exception as e:
             raise e
-    
+
+    def get_user_by_id(self, user_id):
+        try:
+            return self.users.find_one({'_id': user_id})
+
+        except Exception as e:
+            raise e
+
+    def get_all_users(self):
+        try:
+            return list(self.users.find())
+
+        except Exception as e:
+            raise e
+
+    def delete_user(self, user_id):
+        try:
+            self.users.delete_one({'_id': user_id})
+
+        except Exception as e:
+            raise e

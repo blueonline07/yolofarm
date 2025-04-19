@@ -3,11 +3,11 @@ import smtplib
 from threading import Thread
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from app.services.utils import make_decision
-from app.repository.subcriber import SubcriberRepository
+from app.services.utils import Decision
+from app.repository.subcriber import SubscriberRepository
 from app.patterns.singleton import Singleton
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
-from app.services.utils import Action
+from app.services.utils import Control
 
 class BaseNotifier(Singleton, Observer):
 
@@ -15,19 +15,23 @@ class BaseNotifier(Singleton, Observer):
         if self._initialized:
             return
         self._initialized = True
-        self.subcribers = SubcriberRepository.get_instance()
+        self.subcribers = SubscriberRepository.get_instance()
 
-    def add_subcriber(self, email):
+    def add_subcriber(self, data):
         try:
-            self.subcribers.add(email)
+            self.subcribers.add(data)
         except Exception as e:
             raise e
 
     def send_email(self, content):
         if content is not None:
+            channel = content._topic
             msg = MIMEMultipart()
             msg['From'] = MAIL_USERNAME
-            msg['To'] = ", ".join([x['email'] for x in self.subcribers.get_all()])
+            recvs = [x['email'] for x in self.subcribers.get_all_by_channel(channel)]
+            if not recvs:
+                return
+            msg['To'] = ", ".join(recvs)
             msg['Subject'] = 'Adafruit Notification'
             body = str(content)
             msg.attach(MIMEText(body, 'plain'))
@@ -51,7 +55,7 @@ class BoundaryNotifier(BaseNotifier):
         super().__init__()
 
     def update(self, data):
-        alert = make_decision(data['topic'], float(data['value']))
+        alert = Decision.simple(data['topic'], float(data['value']))
         if alert is None:
             return
         t = Thread(target=self.send_email, args=(alert,))
@@ -65,7 +69,7 @@ class ActionNotifier(BaseNotifier):
         topic = data['topic']
         if topic not in ['fan', 'pump', 'light']:
             return
-        action = Action(topic, float(data['value']))
+        action = Control(topic, float(data['value']))
         t = Thread(target=self.send_email, args=(action,))
         t.start()
 
