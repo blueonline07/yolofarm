@@ -4,7 +4,7 @@ from threading import Thread
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.services.utils import Decision
-from app.repository.subcriber import SubscriberRepository
+from app.repository.subscriber import SubscriberRepository
 from app.patterns.singleton import Singleton
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
 from app.services.utils import Control
@@ -15,11 +15,11 @@ class BaseNotifier(Singleton, Observer):
         if self._initialized:
             return
         self._initialized = True
-        self.subcribers = SubscriberRepository.get_instance()
+        self.subscribers = SubscriberRepository.get_instance()
 
-    def add_subcriber(self, data):
+    def add_subscriber(self, data):
         try:
-            self.subcribers.add(data)
+            self.subscribers.add(data)
         except Exception as e:
             raise e
 
@@ -28,7 +28,7 @@ class BaseNotifier(Singleton, Observer):
             channel = content._topic
             msg = MIMEMultipart()
             msg['From'] = MAIL_USERNAME
-            recvs = [x['email'] for x in self.subcribers.get_all_by_channel(channel)]
+            recvs = [x['email'] for x in self.subscribers.get_all_by_channel(channel)]
             if not recvs:
                 return
             msg['To'] = ", ".join(recvs)
@@ -55,6 +55,8 @@ class BoundaryNotifier(BaseNotifier):
         super().__init__()
 
     def update(self, data):
+        if data['topic'] not in ['temp', 'humidity', 'moisture', 'light']:
+            return
         alert = Decision.simple(data['topic'], float(data['value']))
         if alert is None:
             return

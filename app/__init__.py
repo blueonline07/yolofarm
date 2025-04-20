@@ -3,6 +3,7 @@ from flask import Flask, request
 from app.config import JWT_SECRET
 from app.services.mqtt import AdafruitService
 from app.controllers.user_controller import user_bp
+from app.controllers.device_controller import device_bp
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from app.services.notification import BoundaryNotifier, BaseNotifier, ActionNotifier
@@ -21,14 +22,7 @@ def create_app():
     sv.attach(ActionNotifier())
     tv = ThresholdService()
     app.register_blueprint(user_bp, url_prefix='/users')
-
-    @app.route('/<feed>', methods=['POST'])
-    @jwt_required(role=['admin'])
-    def post_data(feed):
-        val = request.json.get('value')
-        #TODO: restrict topic to fan, pump, led only
-        sv.publish_val(feed, val)
-        return f"value {val} added to feed {feed}"
+    app.register_blueprint(device_bp, url_prefix='/devices')
 
     
     @app.route('/subscription', methods=['POST'])

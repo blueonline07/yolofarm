@@ -71,3 +71,16 @@ def get_all_users():
         return jsonify(users), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@user_bp.route('/<user_id>', methods=['DELETE'])
+@jwt_required(role=['admin'])
+def delete_user(user_id):
+    try:
+        user_id = ObjectId(user_id)
+        result = user_repository.delete_user(user_id)
+        if result:
+            return jsonify({"message": "User deleted successfully"}), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

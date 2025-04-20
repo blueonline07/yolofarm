@@ -22,7 +22,9 @@ class UserRepository(Singleton):
         user_data = {
             'email': email,
             'password': hashed_password,
-            'role':'user'
+            'role':'user',
+            'channels': [],
+            'permissions': []
         }
         try:
             existing_user = self.get_user_by_email(email)
@@ -59,5 +61,22 @@ class UserRepository(Singleton):
         try:
             self.users.delete_one({'_id': user_id})
 
+        except Exception as e:
+            raise e
+
+    def get_users_by_channel(self ,channel):
+        try:
+            user = list(self.users.find())
+            ret = []
+            for u in user:
+                if channel in u['channels']:
+                    ret.append(u)
+            return ret
+        except Exception as e:
+            raise e
+
+    def update(self, user):
+        try:
+            self.users.update_one({'_id': user['_id']}, {'$set': user})
         except Exception as e:
             raise e
