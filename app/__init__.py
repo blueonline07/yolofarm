@@ -31,7 +31,7 @@ def create_app():
         return f"value {val} added to feed {feed}"
 
     
-    @app.route('/subcription', methods=['POST'])
+    @app.route('/subscription', methods=['POST'])
     @jwt_required(role=['user', 'admin'])
     def subscribe():
         data = request.json
@@ -40,7 +40,7 @@ def create_app():
         tok = tok.split(" ")[1]
         decoded = jwt.decode(tok, JWT_SECRET, algorithms=['HS256'])
         email = decoded.get('email')
-        BaseNotifier().add_subcriber({"email": email, "channels": channels})
+        BaseNotifier().add_subscriber({"email": email, "channels": channels})
         return "subscribed successfully", 200
 
     @app.route('/config', methods=['POST'])
@@ -55,5 +55,10 @@ def create_app():
             return f"threshold set for {topic} between {lower} and {upper}"
         else:
             return "invalid input", 400
+
+    @app.route('/config', methods=['GET'])
+    @jwt_required(role=['admin'])
+    def get_config():
+        return tv.get_all_thresholds(), 200
 
     return socketio, app
