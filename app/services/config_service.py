@@ -51,14 +51,22 @@ class PermissionService(Singleton):
         if self._initialized:
             return
         self._initialized = True
-        self.user_repository = UserRepository.get_instance()
+        self.__user_repository = UserRepository.get_instance()
 
-    def add_permission(self, user_id, permissions):
+    def add_permission(self, email, permissions):
         try:
-            user = self.user_repository.get_user_by_id(user_id)
+            user = self.__user_repository.get_user_by_email(email)
             if not user:
                 raise Exception("User not found")
             user['permissions'] = list(set(user['permissions']).union(permissions))
-            self.user_repository.update(user)
+            self.__user_repository.update_by_email(email, user)
+        except Exception as e:
+            raise e
+
+    def get_authorized_users(self, topic):
+        try:
+            users = self.__user_repository.get_all_users()
+            authorized_users = [user['email'] for user in users if topic in user['permissions']]
+            return authorized_users
         except Exception as e:
             raise e

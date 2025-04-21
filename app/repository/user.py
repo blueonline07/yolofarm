@@ -75,8 +75,8 @@ class UserRepository(Singleton):
         except Exception as e:
             raise e
 
-    def update(self, user):
+    def update_by_email(self,email, user):
         try:
-            self.users.update_one({'_id': user['_id']}, {'$set': user})
+            self.users.update_one({'email': email}, {'$set': user})
         except Exception as e:
             raise e
