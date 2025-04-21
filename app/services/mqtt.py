@@ -2,6 +2,7 @@ from Adafruit_IO import MQTTClient
 from app.config import ADAFRUIT_KEY, ADAFRUIT_USERNAME
 from app.patterns.observer import Subject
 from app.patterns.singleton import Singleton
+from app.services.utils import Action, Log
 
 feeds = ['temp', 'humidity', 'moisture', 'light']
 
@@ -25,18 +26,10 @@ class AdafruitService(Singleton, Subject):
         if topic in feeds:
             raise Exception("Invalid topic")
         print(f"Publishing value '{val}' to topic '{topic}'")
-        self.client.publish(topic, str(val))
-        self.notify({
-            'user': user,
-            'topic': topic,
-            'value': val
-        })
+        self.client.publish(topic, val)
+        self.notify(Action(user, topic, float(val)))
 
     def message_received(self, client, topic, message):
         print(f"Received message '{message}' on topic '{topic}'")
-        data = {
-            'topic': topic,
-            'value': message
-        }
-        self.notify(data)
+        self.notify(Log(topic, float(message)))
 

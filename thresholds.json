@@ -1,18 +1,18 @@
 {
     "temp": {
-        "lower": 12,
+        "lower": 15,
         "upper": 40
     },
     "humidity": {
-        "lower": 12,
+        "lower": 20,
         "upper": 40
     },
     "light": {
-        "lower": 12,
+        "lower": 20,
         "upper": 40
     },
     "moisture": {
-        "lower": 12,
-        "upper": 40
+        "lower": 20,
+        "upper": 20
     }
 }

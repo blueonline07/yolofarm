@@ -10,13 +10,13 @@ threshold_bp = Blueprint('threshold', __name__)
 def config():
     data = request.json
     topic = data.get('topic')
-    lower = data.get('lower')
-    upper = data.get('upper')
-    if topic and lower and upper:
-        tv.set_threshold(topic, lower, upper)
-        return f"threshold set for {topic} between {lower} and {upper}"
-    else:
-        return "invalid input", 400
+    val = data.get('value')
+    bound = data.get('bound')
+    try:
+        tv.set_threshold(topic, val, bound)
+        return f"threshold set {val} for {topic} at {bound}", 200
+    except Exception as e:
+        return str(e), 500
 
 @threshold_bp.route('', methods=['GET'])
 @jwt_required(role=['admin', 'user'])

@@ -1,3 +1,5 @@
+from pymongo import MongoClient
+
 from app.patterns.observer import Observer
 import smtplib
 from threading import Thread
@@ -5,10 +7,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.repository.subscriber import SubscriberRepository
 from app.patterns.singleton import Singleton
-from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
-from app.services.decision_making import Decision
-from app.services.utils import Action
-
+from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL, MONGODB_URI
+from app.services.utils import Action, Log, ConfigThreshold, Alert, EmailSent
+from app.repository.config_threshold import ThresholdRepository
 
 class BaseNotifier(Singleton, Observer):
 
@@ -17,6 +18,9 @@ class BaseNotifier(Singleton, Observer):
             return
         self._initialized = True
         self.subscribers = SubscriberRepository.get_instance()
+        self.logs = MongoClient(MONGODB_URI)
+        self.logs = self.logs['yolofarm']
+        self.logs = self.logs['logs']
 
     def add_subscriber(self, data):
         try:
@@ -54,32 +58,54 @@ class BaseNotifier(Singleton, Observer):
                     print(f"Email sent to {msg['To']}")
             except Exception as e:
                 print(f"Failed to send email: {e}")
+
+    def store_log(self, data):
+        try:
+            self.logs.insert_one({
+                'content': str(data),
+                'timestamp': data._timestamp,
+            })
+        except Exception as e:
+            raise e
     def update(self, data):
         pass
 
 class BoundaryNotifier(BaseNotifier):
     def __init__(self):
         super().__init__()
+        self.threshold_repository = ThresholdRepository()
 
-    def update(self, data):
-        if data['topic'] not in ['temp', 'humidity', 'moisture', 'light']:
+    def update(self, data: Log):
+        if type(data) is not Log:
             return
-        alert = Decision.simple(data['topic'], float(data['value']))
-        if alert is None:
-            return
+        alert = None
+        min = self.threshold_repository.get_threshold(data._topic).get('lower')
+        max = self.threshold_repository.get_threshold(data._topic).get('upper')
+        if min > data._value or max < data._value:
+            alert = Alert(data._topic, data._value)
         t = Thread(target=self.send_email, args=(alert,))
         t.start()
-        
+        t.join()
+
 class ActionNotifier(BaseNotifier):
     def __init__(self):
         super().__init__()
 
-    def update(self, data):
-        if data['topic'] not in ['fan', 'pump', 'led']:
+    def update(self, data: Action):
+        if type(data) is not Action:
             return
-        action = Action(data['user'], data['topic'], float(data['value']))
-        t = Thread(target=self.send_email, args=(action,))
+        t = Thread(target=self.send_email, args=(data,))
         t.start()
+        self.store_log(data)
 
+class ThresholdNotifier(BaseNotifier):
+    def __init__(self):
+        super().__init__()
 
+    def update(self, data: ConfigThreshold):
+        if type(data) is not ConfigThreshold:
+            return
+        t = Thread(target=self.send_email, args=(data,))
+        t.start()
+        self.store_log(data)
     

@@ -1,38 +1,22 @@
 import json
-from pathlib import Path
 
+from app.patterns.observer import Subject
 from app.patterns.singleton import Singleton
+from app.repository.config_threshold import ThresholdRepository
 from app.repository.user import UserRepository
+from app.services.notification import ThresholdNotifier
+from app.services.utils import ConfigThreshold
 
 
-class ThresholdRepository(Singleton):
-    def __init__(self, file_path='thresholds.json'):
 
-        if self._initialized:
-            return
-        self._initialized = True
-        self.file_path = Path(file_path)
-        if not self.file_path.exists():
-            self.file_path.write_text(json.dumps({}))
-
-    def get_threshold(self, topic):
-        with self.file_path.open('r') as f:
-            data = json.load(f)
-        return data.get(topic, {})
-
-    def set_threshold(self, topic, lower, upper):
-        with self.file_path.open('r') as f:
-            data = json.load(f)
-        data[topic] = {'lower': lower, 'upper': upper}
-        with self.file_path.open('w') as f:
-            json.dump(data, f, indent=4)
-
-class ThresholdService(Singleton):
+class ThresholdService(Singleton, Subject):
     def __init__(self):
         if self._initialized:
             return
+        super().__init__()
         self._initialized = True
         self.repository = ThresholdRepository()
+        self.attach(ThresholdNotifier())
 
     def get_all_thresholds(self):
         with self.repository.file_path.open('r') as f:
@@ -42,10 +26,9 @@ class ThresholdService(Singleton):
     def get_threshold(self, topic):
         return self.repository.get_threshold(topic)
 
-    def set_threshold(self, topic, lower, upper):
-        # self.notify()
-        return self.repository.set_threshold(topic, lower, upper)
-
+    def set_threshold(self, topic, val, bound):
+        self.notify(ConfigThreshold(topic, val, bound))
+        return self.repository.set_threshold(topic, val ,bound)
 
 class PermissionService(Singleton):
     def __init__(self):
