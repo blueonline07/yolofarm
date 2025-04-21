@@ -20,10 +20,20 @@ class SubscriberRepository(Singleton):
         try:
             print(user)
             user['channels'] = list(set(user['channels']).union(data['channels']))
-            self.user_repository.update(user)
+            self.user_repository.update_by_email(user['email'], user)
         except Exception as e:
             raise e
 
+    def remove(self, data):
+        user = self.user_repository.get_user_by_email(data['email'])
+        if not user:
+            raise Exception("User not found")
+        try:
+            user['channels'] = list(set(user['channels']).difference(data['channels']))
+            print(user)
+            self.user_repository.update_by_email(user['email'], user)
+        except Exception as e:
+            raise e
 
     def get_all_by_channel(self, channel):
         try:

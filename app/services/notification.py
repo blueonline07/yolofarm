@@ -23,6 +23,12 @@ class BaseNotifier(Singleton, Observer):
         except Exception as e:
             raise e
 
+    def remove_subscriber(self, data):
+        try:
+            self.subscribers.remove(data)
+        except Exception as e:
+            raise e
+
     def send_email(self, content):
         if content is not None:
             channel = content._topic
