@@ -51,7 +51,7 @@ def create_app():
             return "invalid input", 400
 
     @app.route('/config', methods=['GET'])
-    @jwt_required(role=['admin'])
+    @jwt_required(role=['user', 'admin'])
     def get_config():
         return tv.get_all_thresholds(), 200
 
