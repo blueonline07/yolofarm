@@ -43,6 +43,7 @@ class ThresholdService(Singleton):
         return self.repository.get_threshold(topic)
 
     def set_threshold(self, topic, lower, upper):
+        # self.notify()
         return self.repository.set_threshold(topic, lower, upper)
 
 

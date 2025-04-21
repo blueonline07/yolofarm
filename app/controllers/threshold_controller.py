@@ -19,6 +19,6 @@ def config():
         return "invalid input", 400
 
 @threshold_bp.route('', methods=['GET'])
-@jwt_required(role=['admin'])
+@jwt_required(role=['admin', 'user'])
 def get_config():
     return tv.get_all_thresholds(), 200
