@@ -21,9 +21,13 @@ class AdafruitService(Singleton, Subject):
         self.client.loop_background()
 
 
-    def publish_val(self, topic, val):
+    def publish_val(self,user, topic, val):
+        if topic in feeds:
+            raise Exception("Invalid topic")
+        print(f"Publishing value '{val}' to topic '{topic}'")
         self.client.publish(topic, str(val))
         self.notify({
+            'user': user,
             'topic': topic,
             'value': val
         })

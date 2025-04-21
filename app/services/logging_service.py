@@ -8,7 +8,6 @@ class LoggingService(Singleton):
         self.client = MongoClient(MONGODB_URI)
         self.db = self.client['yolofarm']
         self.logs = self.db['logs']
-        self.masters = []
 
     def log(self, data):
         try:

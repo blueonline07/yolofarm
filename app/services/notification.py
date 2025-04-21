@@ -3,11 +3,12 @@ import smtplib
 from threading import Thread
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from app.services.utils import Decision
 from app.repository.subscriber import SubscriberRepository
 from app.patterns.singleton import Singleton
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL
-from app.services.utils import Control
+from app.services.decision_making import Decision
+from app.services.utils import Action
+
 
 class BaseNotifier(Singleton, Observer):
 
@@ -74,10 +75,9 @@ class ActionNotifier(BaseNotifier):
         super().__init__()
 
     def update(self, data):
-        topic = data['topic']
-        if topic not in ['fan', 'pump', 'light']:
+        if data['topic'] not in ['fan', 'pump', 'led']:
             return
-        action = Control(topic, float(data['value']))
+        action = Action(data['user'], data['topic'], float(data['value']))
         t = Thread(target=self.send_email, args=(action,))
         t.start()
 
