@@ -1,3 +1,4 @@
+import pymongo
 from pymongo import MongoClient
 from app.config import MONGODB_URI
 from app.patterns.singleton import Singleton
@@ -15,8 +16,8 @@ class LoggingService(Singleton):
         except Exception as e:
             raise e
 
-    def get_logs(self):
+    def get_logs(self, lim):
         try:
-            return list(str(self.logs.find()))
+            return list(self.logs.find().limit(lim).sort('timestamp', pymongo.DESCENDING))
         except Exception as e:
             raise e

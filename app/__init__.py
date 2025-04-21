@@ -11,6 +11,7 @@ from app.services.notification import BoundaryNotifier, BaseNotifier, ActionNoti
 from app.services.socket_service import SocketObserver
 from app.decorators.auth import jwt_required
 from app.services.config_service import ThresholdService
+from app.controllers.log_controller import log_bp
 import jwt
 
 def create_app():
@@ -24,6 +25,7 @@ def create_app():
     app.register_blueprint(user_bp, url_prefix='/users')
     app.register_blueprint(device_bp, url_prefix='/devices')
     app.register_blueprint(threshold_bp, url_prefix='/config')
+    app.register_blueprint(log_bp, url_prefix='/logs')
 
     
     @app.route('/subscription', methods=['POST'])

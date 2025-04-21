@@ -1,3 +1,4 @@
+import pymongo
 from pymongo import MongoClient
 from app.config import MONGODB_URI
 import bcrypt
@@ -50,9 +51,9 @@ class UserRepository(Singleton):
         except Exception as e:
             raise e
 
-    def get_all_users(self):
+    def get_all_users(self, lim):
         try:
-            return list(self.users.find())
+            return list(self.users.find().limit(lim).sort('timestamp', pymongo.DESCENDING))
 
         except Exception as e:
             raise e

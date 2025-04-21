@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from app.repository.subscriber import SubscriberRepository
 from app.patterns.singleton import Singleton
 from app.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USE_SSL, MONGODB_URI
-from app.services.utils import Action, Log, ConfigThreshold, Alert, EmailSent
+from app.services.utils import Action, Log, ConfigThreshold, Alert
 from app.repository.config_threshold import ThresholdRepository
 
 class BaseNotifier(Singleton, Observer):

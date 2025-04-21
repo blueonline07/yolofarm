@@ -5,7 +5,7 @@ from app.services.config_service import ThresholdService
 tv = ThresholdService()
 threshold_bp = Blueprint('threshold', __name__)
 
-@threshold_bp.route('', methods=['POST'])
+@threshold_bp.route('/', methods=['POST'])
 @jwt_required(role=['admin'])
 def config():
     data = request.json

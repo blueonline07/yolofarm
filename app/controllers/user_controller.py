@@ -67,7 +67,8 @@ def get_user_by_id(user_id):
 @jwt_required(role=['admin'])
 def get_all_users():
     try:
-        users = [{"_id": str(user['_id']), "email": user['email'], "role": user['role']} for user in user_repository.get_all_users()]
+        lim = request.args.get('limit', default=10, type=int)
+        users = [{"_id": str(user['_id']), "email": user['email'], "role": user['role']} for user in user_repository.get_all_users(lim)]
         return jsonify(users), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
