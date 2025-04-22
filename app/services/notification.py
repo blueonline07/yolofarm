@@ -22,15 +22,9 @@ class BaseNotifier(Singleton, Observer):
         self.logs = self.logs['yolofarm']
         self.logs = self.logs['logs']
 
-    def add_subscriber(self, data):
+    def update_subscriber(self, data):
         try:
-            self.subscribers.add(data)
-        except Exception as e:
-            raise e
-
-    def remove_subscriber(self, data):
-        try:
-            self.subscribers.remove(data)
+            self.subscribers.update(data)
         except Exception as e:
             raise e
 

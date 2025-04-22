@@ -37,19 +37,8 @@ def create_app():
         tok = tok.split(" ")[1]
         decoded = jwt.decode(tok, JWT_SECRET, algorithms=['HS256'])
         email = decoded.get('email')
-        BaseNotifier().add_subscriber({"email": email, "channels": channels})
+        BaseNotifier().update_subscriber({"email": email, "channels": channels})
         return "subscribed successfully", 200
 
-    @app.route('/subscription', methods=['DELETE'])
-    @jwt_required(role=['user', 'admin'])
-    def unsubscribe():
-        data = request.json
-        channels = data.get('channels')
-        tok = request.headers.get('Authorization')
-        tok = tok.split(" ")[1]
-        decoded = jwt.decode(tok, JWT_SECRET, algorithms=['HS256'])
-        email = decoded.get('email')
-        BaseNotifier().remove_subscriber({"email": email, "channels": channels})
-        return "unsubscribed successfully", 200
 
     return socketio, app

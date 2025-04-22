@@ -55,7 +55,9 @@ def get_user_by_id(user_id):
             return jsonify({
                 "_id": str(user['_id']),
                 "email": user['email'],
-                "role": user['role']
+                "role": user['role'],
+                "channels": user['channels'],
+                "permissions": user['permissions']
             }), 200
         else:
             return jsonify({"error": "User not found"}), 404
@@ -68,7 +70,7 @@ def get_user_by_id(user_id):
 def get_all_users():
     try:
         lim = request.args.get('limit', default=10, type=int)
-        users = [{"_id": str(user['_id']), "email": user['email'], "role": user['role']} for user in user_repository.get_all_users(lim)]
+        users = [{"_id": str(user['_id']), "email": user['email'], "role": user['role'], "channels": user['channels'], "permissions": user['permissions']} for user in user_repository.get_all_users(lim)]
         return jsonify(users), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -81,6 +83,27 @@ def delete_user(user_id):
         result = user_repository.delete_user(user_id)
         if result:
             return jsonify({"message": "User deleted successfully"}), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@user_bp.route('/me', methods=['GET'])
+@jwt_required(role=['admin', 'user'])
+def get_current_user():
+    try:
+        token = request.headers.get('Authorization').split(' ')[1]
+        email = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['email']
+        user = user_repository.get_user_by_email(email)
+        if user:
+            return jsonify({
+                "_id": str(user['_id']),
+                "email": user['email'],
+                "role": user['role'],
+                "channels": user['channels'],
+                "permissions": user['permissions']
+            }), 200
         else:
             return jsonify({"error": "User not found"}), 404
     except Exception as e:

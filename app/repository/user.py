@@ -51,8 +51,10 @@ class UserRepository(Singleton):
         except Exception as e:
             raise e
 
-    def get_all_users(self, lim):
+    def get_all_users(self, lim = None):
         try:
+            if lim is None:
+                return list(self.users.find())
             return list(self.users.find().limit(lim).sort('timestamp', pymongo.DESCENDING))
 
         except Exception as e:

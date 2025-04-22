@@ -45,7 +45,7 @@ def add_permission():
     email = data.get('email')
     topics = data.get('topics')
     try:
-        pv.add_permission(email, topics)
+        pv.update_permission(email, topics)
         return "permission added successfully", 200
     except Exception as e:
         return str(e), 500

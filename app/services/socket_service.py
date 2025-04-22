@@ -15,6 +15,6 @@ class SocketObserver(Singleton, Observer):
     def update(self, data: Log):
         if type(data) is not Log:
             return
-        topic = data['topic']
-        message = data['value']
+        topic = data._topic
+        message = data._value
         self.socket.emit('message', json.dumps({'topic': topic, 'value': message}))
