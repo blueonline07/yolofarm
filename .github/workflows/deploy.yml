@@ -20,7 +20,8 @@ jobs:
 
       - name: 🏗️ Build and Push Docker Image
         run: |
-          docker build \
+          docker buildx create --use
+          docker buildx build \
             --build-arg ADAFRUIT_USERNAME=${{ secrets.ADAFRUIT_USERNAME }} \
             --build-arg ADAFRUIT_KEY=${{ secrets.ADAFRUIT_KEY }} \
             --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
